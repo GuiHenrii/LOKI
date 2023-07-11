@@ -6,7 +6,7 @@ const contatos = JSON.parse(fs.readFileSync("contatos.json", "utf8"));
 
 venom
   .create({
-    session: "Disparo-A2m", //name of session
+    session: "Disparo-BI", //name of session
   })
   .then((client) => start(client, 0))
   .catch((erro) => {
@@ -29,7 +29,7 @@ async function start(client, index) {
 
   const numero = "55" + telefone + "@c.us";
 
-  await client
+await client
     .sendText(numero, mensagem)
     .then(() => {
       console.log(
@@ -57,27 +57,17 @@ async function start(client, index) {
     }
 
     // Verifica se a mensagem é de grupo e se o número de telefone já está salvo no JSON
-    if (
-      message.isGroupMsg === false &&
-      !verificarTelefoneExistente(message.from)
-    ) {
+    if (message.isGroupMsg === false) {
       console.log("Creating new atendimento entry");
-
       const dados = {
         tel: message.from,
         nome: message.notifyName,
         atendido: 1,
       };
-
       dialogo1(client, message);
       salvaContato(dados);
     }
   });
-}
-
-function verificarTelefoneExistente(telefone) {
-  const atendimentos = JSON.parse(fs.readFileSync("atendimentos.json", "utf8"));
-  return atendimentos.some((item) => item.tel === telefone);
 }
 
 function salvaContato(tempObj) {
