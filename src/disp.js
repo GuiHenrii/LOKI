@@ -48,12 +48,12 @@ async function start(client, index) {
 
   client.onMessage(async (message) => {
     const atendidos = JSON.parse(fs.readFileSync("atendimentos.json", "utf8"));
-    const atendido = atendidos.tel
-    const cliente = message.from 
+    const atendido = atendidos.tel;
+    const cliente = message.from;
 
-    if(atendido === cliente){
-      console.log("Cliente já atendido")
-      return
+    if (atendido === cliente) {
+      console.log("Cliente já atendido");
+      return;
     }
 
     // Verifica se a mensagem é de grupo e se o número de telefone já está salvo no JSON
@@ -76,9 +76,7 @@ async function start(client, index) {
 }
 
 function verificarTelefoneExistente(telefone) {
-  const atendimentos = JSON.parse(
-    fs.readFileSync("atendimentos.json", "utf8")
-  );
+  const atendimentos = JSON.parse(fs.readFileSync("atendimentos.json", "utf8"));
   return atendimentos.some((item) => item.tel === telefone);
 }
 
