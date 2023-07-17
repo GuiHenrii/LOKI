@@ -357,11 +357,6 @@
     "atendido": 1
   },
   {
-    "tel": "553499601296@c.us",
-    "nome": "Guilherme Rosa",
-    "atendido": 1
-  },
-  {
     "tel": "556285944445@c.us",
     "atendido": 1
   },
@@ -1549,6 +1544,26 @@
   {
     "tel": "553498330330@c.us",
     "nome": "Loja Mais Chic - Griff Shopping",
+    "atendido": 1
+  },
+  {
+    "tel": "553499601296@c.us",
+    "nome": "Guilherme Rosa",
+    "atendido": 1
+  },
+  {
+    "tel": "553499601296@c.us",
+    "nome": "Guilherme Rosa",
+    "atendido": 1
+  },
+  {
+    "tel": "553499601296@c.us",
+    "nome": "Guilherme Rosa",
+    "atendido": 1
+  },
+  {
+    "tel": "553499601296@c.us",
+    "nome": "Guilherme Rosa",
     "atendido": 1
   }
 ]

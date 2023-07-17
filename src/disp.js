@@ -1,20 +1,20 @@
 const venom = require("venom-bot");
 const fs = require("fs");
-const dialogo1 = require("./dialogos/dialogo1");
+const dialogo1 = require("./dialogos/dialogo");
 
+const sessionName = "Disparo-BI";
 const contatos = JSON.parse(fs.readFileSync("contatos.json", "utf8"));
 
-venom
-  .create({
-    session: "Disparo-BI", //name of session
-  })
+
+venom.create({ session: sessionName })
   .then((client) => start(client, 0))
-  .catch((erro) => {
-    console.log(erro);
+  .catch((error) => {
+    console.error('Erro ao criar o cliente Venom:', error);
+    process.exit(1); // Termina o processo com um código de erro
   });
 
-async function start(client, index) {
-  console.log("iniciado");
+function start(client, index) {
+  console.log("Iniciado");
 
   if (index >= contatos.length) {
     console.log("Todas as mensagens foram enviadas!");
@@ -29,44 +29,40 @@ async function start(client, index) {
 
   const numero = "55" + telefone + "@c.us";
 
-await client
-    .sendText(numero, mensagem)
-    .then(() => {
-      console.log(
-        `Mensagem enviada para ${nome} no número ${numero}, foram disparados ${id}`
-      );
-      setTimeout(() => {
-        start(client, index + 1); // Chamar a função após 30 segundos
-      }, 20000); // Aguardar 30 segundos
-    })
-    .catch((error) => {
-      console.error(`Erro ao enviar mensagem para: ${numero}`, error);
-      setTimeout(() => {
-        start(client, index + 1); // Chamar a função após 30 segundos, mesmo em caso de erro
-      }, 20000); // Aguardar 30 segundos
-    });
+  try {
+   client.sendText(numero, mensagem);
+    console.log(`Mensagem enviada para ${nome} no número ${numero}, foram disparados ${id}`);
+    setTimeout(() => {
+      start(client, index + 1); // Chamar a função após 30 segundos
+    }, 20000); // Aguardar 30 segundos
+  } catch (error) {
+    console.error(`Erro ao enviar mensagem para: ${numero}`, error);
+    setTimeout(() => {
+      start(client, index + 1); // Chamar a função após 30 segundos, mesmo em caso de erro
+    }, 20000); // Aguardar 30 segundos
+  }
 
   client.onMessage(async (message) => {
-    const atendidos = JSON.parse(fs.readFileSync("atendimentos.json", "utf8"));
-    const atendido = atendidos.tel;
-    const cliente = message.from;
-
-    if (atendido === cliente) {
-      console.log("Cliente já atendido");
-      return;
-    }
-
-    // Verifica se a mensagem é de grupo e se o número de telefone já está salvo no JSON
     if (message.isGroupMsg === false) {
-      console.log("Creating new atendimento entry");
+    const cliente = message.from;
+    
+    const encontrado = await pesquisarNoArquivoJSON(cliente);
+    console.log(encontrado);
+    console.dir(encontrado);
+  
+    if (cliente === encontrado.tel) {
+        console.log("Cliente atendido");
+    }else{
+      console.log("Criando nova entrada de atendimento");
       const dados = {
-        tel: message.from,
+        tel:cliente,
         nome: message.notifyName,
         atendido: 1,
       };
       dialogo1(client, message);
       salvaContato(dados);
     }
+  }
   });
 }
 
@@ -93,4 +89,24 @@ function salvaContato(tempObj) {
       console.log("Arquivo atendimentos.json salvo com sucesso");
     });
   });
+}
+
+async function pesquisarNoArquivoJSON(valorDesejado) {
+  const atendimentosFile = './atendimentos.json';
+
+  try {
+    const data = await fs.promises.readFile(atendimentosFile, 'utf8');
+    const jsonContent = JSON.parse(data);
+    const encontrado = jsonContent.find(item => item.tel === valorDesejado);
+    console.log(encontrado);
+    return encontrado;
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      console.log('Arquivo não encontrado');
+      return undefined;
+    } else {
+      console.error(err);
+      throw err;
+    }
+  }
 }
