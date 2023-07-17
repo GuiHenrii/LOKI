@@ -25,7 +25,7 @@ async function start(client, index) {
   const telefone = contato.telefone;
   const nome = contato.nome;
   const id = contato.id;
-  const mensagem = "Olá! Tudo bem?";
+  const mensagem = "Olá! Tudo bem??";
 
   const numero = "55" + telefone + "@c.us";
 
