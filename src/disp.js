@@ -25,7 +25,7 @@ function start(client, index) {
   const telefone = contato.telefone;
   const nome = contato.nome;
   const id = contato.id;
-  const mensagem = "Olá! Tudo bem??";
+  const mensagem = "Olá! Tudo bem??"; //É o texto usado para o primeiro envio
 
   const numero = "55" + telefone + "@c.us";
 
