@@ -43,26 +43,33 @@ function start(client, index) {
   }
 
   client.onMessage(async (message) => {
-    if (message.isGroupMsg === false) {
-    const cliente = message.from;
-    
-    const encontrado = await pesquisarNoArquivoJSON(cliente);
-    console.log(encontrado);
-    console.dir(encontrado);
-  
-    if (cliente === encontrado.tel) {
-        console.log("Cliente atendido");
-    }else{
-      console.log("Criando nova entrada de atendimento");
-      const dados = {
-        tel:cliente,
-        nome: message.notifyName,
-        atendido: 1,
-      };
-      dialogo1(client, message);
-      salvaContato(dados);
+    console.log(message)
+    try{
+    // Verificar se a mensagem é do sistema do WhatsApp
+   if (message.type === 'system' || message.content === 'Esta mensagem foi excluída') {
+    // Ignorar mensagens do sistema ou mensagens excluídas
+      console.log('Mensagem do sistema ou mensagem excluída recebida:', message.body);
+      return;
+   }
+      if (message.isGroupMsg === false && message.type === 'chat') {
+        const cliente = message.from;
+        const encontrado = await pesquisarNoArquivoJSON(cliente);
+        if (encontrado != undefined) {
+          console.log("Cliente atendido");
+        } else {
+          console.log("Criando nova entrada de atendimento");
+          const dados = {
+            tel: cliente,
+            nome: message.notifyName,
+            atendido: 1,
+          };
+          dialogo1(client, message);
+          salvaContato(dados);
+        }
+      }
+    }catch(error){
+      console.log("Resultado do erro" + error)
     }
-  }
   });
 }
 
