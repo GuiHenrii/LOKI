@@ -9,17 +9,15 @@ const contatos = JSON.parse(fs.readFileSync("contatos.json", "utf8"));
 venom.create({ session: sessionName })
   .then((client) => start(client, 0))
   .catch((error) => {
-    console.error('Erro ao criar o cliente Venom:', error);
-    process.exit(1); // Termina o processo com um código de erro
+    console.error('Erro ao criar o cliente Venom:', error); // Termina o processo com um código de erro
   });
 
 function start(client, index) {
-  console.log("Iniciado");
+  console.log("Disparador Iniciado");
 
   if (index >= contatos.length) {
     console.log("Todas as mensagens foram enviadas!");
-    return;
-  }
+  }else{
 
   const contato = contatos[index];
   const telefone = contato.telefone;
@@ -30,8 +28,13 @@ function start(client, index) {
   const numero = "55" + telefone + "@c.us";
 
   try {
-   client.sendText(numero, mensagem);
-    console.log(`Mensagem enviada para ${nome} no número ${numero}, foram disparados ${id}`);
+    client.sendText(numero, mensagem)
+    .then(() => {
+      console.log(`Mensagem enviada para ${nome} no número ${numero}, foram disparados ${id}`);
+    })
+    .catch((erro) => {
+      console.error('Error when sending: ', erro); //return object error
+    });
     setTimeout(() => {
       start(client, index + 1); // Chamar a função após 30 segundos
     }, 20000); // Aguardar 30 segundos
@@ -41,16 +44,17 @@ function start(client, index) {
       start(client, index + 1); // Chamar a função após 30 segundos, mesmo em caso de erro
     }, 20000); // Aguardar 30 segundos
   }
+}
 
   client.onMessage(async (message) => {
     console.log(message)
     try{
-    // Verificar se a mensagem é do sistema do WhatsApp
-   if (message.type === 'system' || message.content === 'Esta mensagem foi excluída') {
-    // Ignorar mensagens do sistema ou mensagens excluídas
-      console.log('Mensagem do sistema ou mensagem excluída recebida:', message.body);
-      return;
-   }
+        // Verificar se a mensagem é do sistema do WhatsApp
+      if (!message.type || message.content === 'Esta mensagem foi excluída') {
+        // Ignorar mensagens do sistema ou mensagens excluídas
+          console.log('Mensagem do sistema ou mensagem excluída recebida:', message.body);
+          return;
+      }
       if (message.isGroupMsg === false && message.type === 'chat') {
         const cliente = message.from;
         const encontrado = await pesquisarNoArquivoJSON(cliente);
@@ -63,7 +67,7 @@ function start(client, index) {
             nome: message.notifyName,
             atendido: 1,
           };
-          dialogo1(client, message);
+          await dialogo1(client, message);
           salvaContato(dados);
         }
       }
